@@ -259,6 +259,75 @@ const getOrgnaisationForHospitalController = async (req, res) => {
   }
 };
 
+// Get all organisations for donor to select
+const getAllOrganisationsController = async (req, res) => {
+  try {
+    const organisations = await userModel.find({ role: "organisation" });
+    return res.status(200).send({
+      success: true,
+      message: "All Organisations Fetched Successfully",
+      organisations,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error In Getting All Organisations",
+      error,
+    });
+  }
+};
+
+// Donor creates donation record
+const donorCreateDonationController = async (req, res) => {
+  try {
+    const { organisationId, bloodGroup, quantity } = req.body;
+    const donorId = req.body.userId;
+
+    // Verify organisation exists
+    const organisation = await userModel.findById(organisationId);
+    if (!organisation || organisation.role !== "organisation") {
+      return res.status(404).send({
+        success: false,
+        message: "Organisation not found",
+      });
+    }
+
+    // Get donor details
+    const donor = await userModel.findById(donorId);
+    if (!donor) {
+      return res.status(404).send({
+        success: false,
+        message: "Donor not found",
+      });
+    }
+
+    // Create inventory record
+    const inventory = new inventoryModel({
+      inventoryType: "in",
+      bloodGroup,
+      quantity,
+      email: donor.email,
+      organisation: organisationId,
+      donar: donorId,
+    });
+
+    await inventory.save();
+
+    return res.status(201).send({
+      success: true,
+      message: "Donation recorded successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error in recording donation",
+      error,
+    });
+  }
+};
+
 module.exports = {
   createInventoryController,
   getInventoryController,
@@ -268,4 +337,6 @@ module.exports = {
   getOrgnaisationForHospitalController,
   getInventoryHospitalController,
   getRecentInventoryController,
+  getAllOrganisationsController,
+  donorCreateDonationController,
 };
