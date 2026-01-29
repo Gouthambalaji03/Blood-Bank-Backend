@@ -17,7 +17,7 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'https://blood-bank-frontend-nu-1ac.vercel.app',
+    'https://blood-bank-frontend-nu-lac.vercel.app',
     /\.vercel\.app$/  // Allow all Vercel preview deployments
   ],
   credentials: true,
